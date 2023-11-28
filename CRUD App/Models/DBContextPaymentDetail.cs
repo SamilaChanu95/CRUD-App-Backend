@@ -5,7 +5,6 @@ namespace CRUD_App.Models
 {
     public class DBContextPaymentDetail : DbContext
     {
-        /*private readonly DbContextOptions _options; */
         public DBContextPaymentDetail(DbContextOptions options) : base(options)
         {
         }
