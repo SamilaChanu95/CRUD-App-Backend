@@ -23,7 +23,7 @@ namespace CRUD_App.Controllers
         }
 
         // GET: api/PaymentDetail/5
-        [HttpGet("{id:number}")]
+        [HttpGet("{id:int}")]
         public async Task<ActionResult<PaymentDetail>> GetPaymentDetail([FromRoute] int id)
         {
             var paymentDetail = await _context.PaymentDetails.FindAsync(id);
@@ -37,7 +37,7 @@ namespace CRUD_App.Controllers
 
         // PUT: api/PaymentDetail/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id:number}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> PutPaymentDetail([FromRoute] int id ,[FromQuery] PaymentDetail paymentDetail)
         {
             if (id != paymentDetail.PaymentDetailId)
@@ -78,7 +78,7 @@ namespace CRUD_App.Controllers
         }
 
         // DELETE: api/PaymentDetail/5
-        [HttpDelete("{id:number}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeletePaymentDetail([FromRoute] int id)
         {
             var paymentDetail = await _context.PaymentDetails.FindAsync(id);
