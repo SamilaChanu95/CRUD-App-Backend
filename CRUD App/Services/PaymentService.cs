@@ -24,7 +24,13 @@ namespace CRUD_App.Services
                 return false;
             }
             var result = _dBContextPaymentDetail.PaymentDetails.Remove(paymentDetailExist);
-            return true;
+            if (result != null)
+            {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
 
         public PaymentDetail GetPaymentDetail(int id)

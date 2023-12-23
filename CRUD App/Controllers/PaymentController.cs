@@ -10,9 +10,11 @@ namespace CRUD_App.Controllers
     public class PaymentController : Controller
     {
         private readonly IPaymentService _paymentService;
-        public PaymentController(IPaymentService paymentService)
+        private readonly ILogger<PaymentController> _logger;
+        public PaymentController(IPaymentService paymentService, ILogger<PaymentController> logger)
         {
             _paymentService = paymentService;
+            _logger = logger;
         }
 
         [HttpGet("get-payment-list")]
@@ -21,14 +23,22 @@ namespace CRUD_App.Controllers
         [ProducesResponseType(400)]
         public IActionResult GetAll()
         {
-            if (ModelState.IsValid) 
+            try
             {
-                var result = _paymentService.GetAll();
-                return Ok(result);
+                if (ModelState.IsValid)
+                {
+                    var result = _paymentService.GetAll();
+                    return Ok(result);
+                }
+
+                var ErrorResponse = new ErrorResponse { ErrorCode = "490", ErrorDescription = "There is an error in the System's Server-Side. Please try again.", ErrorGeneratedAt = DateTime.Now };
+                return BadRequest(ErrorResponse);
+            } 
+            catch (Exception ex) {
+                _logger.LogError(ex.Message);
+                var ErrorResponse = new ErrorResponse { ErrorCode = "999", ErrorDescription = ex.Message, ErrorGeneratedAt = DateTime.Now };
+                return BadRequest(ErrorResponse);
             }
-            
-            var ErrorResponse = new ErrorResponse{ ErrorCode = "490", ErrorDescription = "There is an error in the System's Server-Side. Please try again.", ErrorGeneratedAt = DateTime.Now };
-            return BadRequest(ErrorResponse);
         }
 
         [HttpGet("get-payment/{id:int}")]
