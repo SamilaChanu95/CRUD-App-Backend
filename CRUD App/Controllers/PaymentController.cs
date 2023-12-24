@@ -36,7 +36,7 @@ namespace CRUD_App.Controllers
             } 
             catch (Exception ex) {
                 _logger.LogError(ex.Message);
-                var ErrorResponse = new ErrorResponse { ErrorCode = "999", ErrorDescription = ex.Message, ErrorGeneratedAt = DateTime.Now };
+                var ErrorResponse = new ErrorResponse { ErrorCode = "700", ErrorDescription = ex.Message, ErrorGeneratedAt = DateTime.Now };
                 return BadRequest(ErrorResponse);
             }
         }
@@ -48,22 +48,29 @@ namespace CRUD_App.Controllers
         [ProducesResponseType(404)]
         public IActionResult GetPayment([FromRoute] dynamic id)
         {
-            int integerId; 
-
-            if (!ModelState.IsValid) 
+            int integerId;
+            try 
             {
-                var InvalidErrorResponse = new ErrorResponse { ErrorCode = "490", ErrorDescription = "There is an error in the System's Server-Side. Please try again.", ErrorGeneratedAt = DateTime.Now };
-                return BadRequest(InvalidErrorResponse);
-            }
+                if (!ModelState.IsValid)
+                {
+                    var InvalidErrorResponse = new ErrorResponse { ErrorCode = "490", ErrorDescription = "There is an error in the System's Server-Side. Please try again.", ErrorGeneratedAt = DateTime.Now };
+                    return BadRequest(InvalidErrorResponse);
+                }
 
-            if (int.TryParse(id, out integerId))
-            {
-                var result = _paymentService.GetPaymentDetail(id);
-                return Ok(result);
-            }
+                if (int.TryParse(id, out integerId))
+                {
+                    var result = _paymentService.GetPaymentDetail(id);
+                    return Ok(result);
+                }
 
-            var ErrorResponse = new ErrorResponse { ErrorCode = "491", ErrorDescription = "Input Id value should be valid type of value.", ErrorGeneratedAt = DateTime.Now };
-            return BadRequest(ErrorResponse);
+                var ErrorResponse = new ErrorResponse { ErrorCode = "491", ErrorDescription = "Input Id value should be valid type of value.", ErrorGeneratedAt = DateTime.Now };
+                return BadRequest(ErrorResponse);
+            }
+            catch (Exception ex) {
+                _logger.LogError(ex.Message);
+                var ErrorResponse = new ErrorResponse { ErrorCode = "701", ErrorDescription = ex.Message, ErrorGeneratedAt = DateTime.Now };
+                return BadRequest(ErrorResponse);
+            }
         }
 
         [HttpPost("create-payment")]
@@ -72,14 +79,23 @@ namespace CRUD_App.Controllers
         [ProducesResponseType(400)]
         public IActionResult CreatePayment([FromBody] PaymentDetail paymentDetail)
         {
-            if (ModelState.IsValid) 
+            try 
             {
-                var result = _paymentService.AddPayment(paymentDetail);
-                return Ok(result);
-            }
+                if (ModelState.IsValid)
+                {
+                    var result = _paymentService.AddPayment(paymentDetail);
+                    return Ok(result);
+                }
 
-            var ErrorResponse = new ErrorResponse { ErrorCode = "490", ErrorDescription = "There is an error in the System's Server-Side. Please try again.", ErrorGeneratedAt = DateTime.Now };
-            return BadRequest(ErrorResponse);
+                var ErrorResponse = new ErrorResponse { ErrorCode = "490", ErrorDescription = "There is an error in the System's Server-Side. Please try again.", ErrorGeneratedAt = DateTime.Now };
+                return BadRequest(ErrorResponse);
+            } 
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex.Message);
+                var ErrorResponse = new ErrorResponse { ErrorCode = "702", ErrorDescription = ex.Message, ErrorGeneratedAt = DateTime.Now };
+                return BadRequest(ErrorResponse);
+            }
         }
 
         [HttpPut("update-payment/{id:int}")]
@@ -89,18 +105,27 @@ namespace CRUD_App.Controllers
         [ProducesResponseType(400)]
         public IActionResult UpdatePayment([FromRoute] int id, [FromBody] PaymentDetail paymentDetail)
         {
-            if (!ModelState.IsValid) 
+            try 
             {
-                var InValidErrorResponse = new ErrorResponse { ErrorCode = "490", ErrorDescription = "There is an error in the System's Server-Side. Please try again.", ErrorGeneratedAt = DateTime.Now };
-                return BadRequest(InValidErrorResponse);
-            }
-            if (_paymentService.PaymentExists(id))
+                if (!ModelState.IsValid)
+                {
+                    var InValidErrorResponse = new ErrorResponse { ErrorCode = "490", ErrorDescription = "There is an error in the System's Server-Side. Please try again.", ErrorGeneratedAt = DateTime.Now };
+                    return BadRequest(InValidErrorResponse);
+                }
+                if (_paymentService.PaymentExists(id))
+                {
+                    var result = _paymentService.UpdatePayment(id, paymentDetail);
+                    return Ok(result);
+                }
+                var CustomErrorResponse = new ErrorResponse { ErrorCode = "404", ErrorDescription = "This items not exists in the System. Please check the item and come again.", ErrorGeneratedAt = DateTime.Now };
+                return NotFound(CustomErrorResponse);
+            } 
+            catch (Exception ex) 
             {
-                var result = _paymentService.UpdatePayment(id, paymentDetail);
-                return Ok(result);
+                _logger.LogError(ex.Message);
+                var ErrorResponse = new ErrorResponse { ErrorCode = "703", ErrorDescription = ex.Message, ErrorGeneratedAt = DateTime.Now };
+                return BadRequest(ErrorResponse);
             }
-            var CustomErrorResponse = new ErrorResponse { ErrorCode = "404", ErrorDescription = "This items not exists in the System. Please check the item and come again.", ErrorGeneratedAt = DateTime.Now };
-            return NotFound(CustomErrorResponse);
         }
 
         [HttpDelete("delete-payment/{id:int}")]
@@ -110,18 +135,27 @@ namespace CRUD_App.Controllers
         [ProducesResponseType(400)]
         public IActionResult DeletePayment([FromRoute] int id) 
         {
-            if (!ModelState.IsValid) 
+            try 
             {
-                var InValidErrorResponse = new ErrorResponse { ErrorCode = "490", ErrorDescription = "There is an error in the System's Server-Side. Please try again.", ErrorGeneratedAt = DateTime.Now };
-                return BadRequest(InValidErrorResponse);
+                if (!ModelState.IsValid)
+                {
+                    var InValidErrorResponse = new ErrorResponse { ErrorCode = "490", ErrorDescription = "There is an error in the System's Server-Side. Please try again.", ErrorGeneratedAt = DateTime.Now };
+                    return BadRequest(InValidErrorResponse);
+                }
+                if (_paymentService.PaymentExists(id))
+                {
+                    var result = _paymentService.DeletePayment(id);
+                    return Ok(result);
+                }
+                var CustomErrorResponse = new ErrorResponse { ErrorCode = "404", ErrorDescription = "This items not exists in the System. Please check the item and come again.", ErrorGeneratedAt = DateTime.Now };
+                return NotFound(CustomErrorResponse);
             }
-            if (_paymentService.PaymentExists(id)) 
+            catch (Exception ex) 
             {
-                var result = _paymentService.DeletePayment(id);
-                return Ok(result);
+                _logger.LogError(ex.Message);
+                var ErrorResponse = new ErrorResponse { ErrorCode = "704" , ErrorDescription = ex.Message , ErrorGeneratedAt = DateTime.Now };
+                return BadRequest(ErrorResponse);
             }
-            var CustomErrorResponse = new ErrorResponse { ErrorCode = "404", ErrorDescription = "This items not exists in the System. Please check the item and come again.", ErrorGeneratedAt = DateTime.Now };
-            return NotFound(CustomErrorResponse);
         }
     }
 }
